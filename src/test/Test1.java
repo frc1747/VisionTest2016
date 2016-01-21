@@ -38,6 +38,7 @@ public class Test1 {
     		frame = new JFrame();
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(new ImagePanel(image));
+            frames.put(index, frame);
     	}
         frame.pack();
         frame.setVisible(true);
@@ -58,11 +59,18 @@ public class Test1 {
 			System.exit(0);
 		}
 		Mat image = new Mat();
-		int cnt = 100;
-		while(cnt-- > 0) {
+		for(int i=0;i<10;i++){
 			vcap.read(image);
 			show(convert(image),0);
-			
+		}
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for(int i=0;i<10;i++){
+			close(i);
 		}
 	}
 	
