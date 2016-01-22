@@ -17,4 +17,9 @@ public class ImagePanel extends JPanel {
     public void paint(Graphics g) {
         g.drawImage(image, 0, 0, null);
     }
+    
+    public void setImage(BufferedImage image){
+    	this.image=image;
+    	invalidate();
+    }
 }
