@@ -116,6 +116,7 @@ public class Test1 {
 		Imgproc.cvtColor(ranged, coloredBlurred, Imgproc.COLOR_GRAY2BGR);
 		Imgproc.rectangle(coloredBlurred, new Point(rect.x, rect.y),
 				new Point(rect.x + rect.width, rect.y + rect.height), color, 10);
+		/*
 		// Find the top and bottom line
 		ArrayList<MatOfPoint> test = new ArrayList<MatOfPoint>();
 		test.add(goal);
@@ -141,6 +142,7 @@ public class Test1 {
 		System.out.println(((double) y2 - y1) / ((double) x2 - x1));
 		Imgproc.line(coloredBlurred, new Point(x1, y1), new Point(x1, rect.y + rect.height), color, 10);
 		Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y + rect.height), color, 10);
+		*/
 		show(convert(coloredBlurred), 0);
 		coloredBlurred.release();
 		boxPoints.release();
