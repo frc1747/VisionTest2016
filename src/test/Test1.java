@@ -1,7 +1,5 @@
 package test;
 
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
@@ -9,53 +7,21 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-import org.opencv.core.*;
-import org.opencv.videoio.*;
-import org.opencv.imgcodecs.*;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.videoio.VideoCapture;
 
 public class Test1 {
 
-	HashMap<Integer, JFrame> frames;
-
-	public Test1() {
-		frames = new HashMap<Integer, JFrame>();
-	}
-
-	public BufferedImage convert(Mat image) {
-		int type = BufferedImage.TYPE_BYTE_GRAY;
-		if (image.channels() > 1) {
-			type = BufferedImage.TYPE_3BYTE_BGR;
-		}
-		BufferedImage img = new BufferedImage(image.cols(), image.rows(), type);
-		image.get(0, 0, ((DataBufferByte) img.getRaster().getDataBuffer()).getData());
-		return img;
-	}
-
-	public JFrame show(BufferedImage image, int index) {
-		JFrame frame;
-		if (frames.containsKey(index)) {
-			frame = frames.get(index);
-		} else {
-			frame = new JFrame();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frames.put(index, frame);
-		}
-		frame.add(new ImagePanel(image));
-		frame.pack();
-		frame.setVisible(true);
-		return frame;
-	}
-
-	public void close(int index) {
-		if (frames.containsKey(index)) {
-			frames.get(index).dispose();
-		}
-	}
-
 	@SuppressWarnings("unused")
 	public void test(boolean video) {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Mat src = new Mat();
 		if (video) {
 			VideoCapture vcap = new VideoCapture(0);
@@ -143,7 +109,7 @@ public class Test1 {
 		Imgproc.line(coloredBlurred, new Point(x1, y1), new Point(x1, rect.y + rect.height), color, 10);
 		Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y + rect.height), color, 10);
 		*/
-		show(convert(coloredBlurred), 0);
+		Utils.show(coloredBlurred, 0);
 		coloredBlurred.release();
 		boxPoints.release();
 		goal2f.release();
@@ -153,7 +119,4 @@ public class Test1 {
 		src.release();
 	}
 
-	public static void main(String[] args) {
-		new Test1().test(true);
-	}
 }
