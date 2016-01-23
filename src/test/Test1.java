@@ -1,89 +1,74 @@
 package test;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.JFrame;
-
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
+import java.util.ArrayList;
+
 public class Test1 {
 
-	@SuppressWarnings("unused")
-	public void test(boolean video) {
-		Mat src = new Mat();
-		if (video) {
-			VideoCapture vcap = new VideoCapture(0);
-			if (vcap == null) {
-				System.out.println("VCAP is NULL");
-				System.exit(0);
-			}
-			while (true) {
-				vcap.read(src);
-				processImage(src);
-			}
-		} else {
-			src = Imgcodecs.imread("frame.png");
-			processImage(src);
-		}
-	}
+    @SuppressWarnings("unused")
+    public void test(boolean video) {
+        Mat src = new Mat();
+        if (video) {
+            VideoCapture vcap = new VideoCapture(0);
+            while (true) {
+                vcap.read(src);
+                processImage(src);
+            }
+        } else {
+            src = Imgcodecs.imread("frame.png");
+            processImage(src);
+        }
+    }
 
-	public void processImage(Mat src) {
-		// Look for red
-		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(40, 40, 170);
-		Scalar upperBound = new Scalar(120, 120, 255);
-		Core.inRange(src, lowerBound, upperBound, ranged);
-		// Look for rectangles
-		Mat contoured = ranged.clone();
-		ArrayList<MatOfPoint> pointList = new ArrayList<MatOfPoint>();
-		Mat contourHierarchy = new Mat();
-		Imgproc.findContours(contoured, pointList, contourHierarchy, Imgproc.RETR_EXTERNAL,
-				Imgproc.CHAIN_APPROX_SIMPLE);
-		// Find the biggest rectangle
-		double maxArea = -1;
-		MatOfPoint goal = new MatOfPoint();
-		for (MatOfPoint testContour : pointList) {
-			double area = Imgproc.contourArea(testContour);
-			if (maxArea < area) {
-				maxArea = area;
-				goal.release();
-				goal = testContour;
-			} else {
-				testContour.release();
-			}
-		}
-		if (goal == null) {
-			System.out.println("Goal not found");
-			contoured.release();
-			ranged.release();
-			src.release();
-			return;
-		}
-		// Color it
-		Scalar color = new Scalar(0, 255, 0);
-		MatOfPoint2f approxCurve = new MatOfPoint2f();
-		MatOfPoint2f goal2f = new MatOfPoint2f(goal.toArray());
-		Imgproc.approxPolyDP(goal2f, approxCurve, Imgproc.arcLength(goal2f, true) * .04, true);
-		MatOfPoint boxPoints = new MatOfPoint(approxCurve.toArray());
-		Rect rect = Imgproc.boundingRect(boxPoints);
-		Mat coloredBlurred = new Mat();
-		Imgproc.cvtColor(ranged, coloredBlurred, Imgproc.COLOR_GRAY2BGR);
-		Imgproc.rectangle(coloredBlurred, new Point(rect.x, rect.y),
-				new Point(rect.x + rect.width, rect.y + rect.height), color, 10);
-		/*
-		// Find the top and bottom line
+    public void processImage(Mat src) {
+        // Look for red
+        Mat ranged = new Mat();
+        Scalar lowerBound = new Scalar(40, 40, 170);
+        Scalar upperBound = new Scalar(120, 120, 255);
+        Core.inRange(src, lowerBound, upperBound, ranged);
+        // Look for rectangles
+        Mat contoured = ranged.clone();
+        ArrayList<MatOfPoint> pointList = new ArrayList<>();
+        Mat contourHierarchy = new Mat();
+        Imgproc.findContours(contoured, pointList, contourHierarchy, Imgproc.RETR_EXTERNAL,
+                Imgproc.CHAIN_APPROX_SIMPLE);
+        // Find the biggest rectangle
+        double maxArea = -1;
+        MatOfPoint goal = new MatOfPoint();
+        for (MatOfPoint testContour : pointList) {
+            double area = Imgproc.contourArea(testContour);
+            if (maxArea < area) {
+                maxArea = area;
+                goal.release();
+                goal = testContour;
+            } else {
+                testContour.release();
+            }
+        }
+        if (goal == null) {
+            System.out.println("Goal not found");
+            contoured.release();
+            ranged.release();
+            src.release();
+            return;
+        }
+        // Color it
+        Scalar color = new Scalar(0, 255, 0);
+        MatOfPoint2f approxCurve = new MatOfPoint2f();
+        MatOfPoint2f goal2f = new MatOfPoint2f(goal.toArray());
+        Imgproc.approxPolyDP(goal2f, approxCurve, Imgproc.arcLength(goal2f, true) * .04, true);
+        MatOfPoint boxPoints = new MatOfPoint(approxCurve.toArray());
+        Rect rect = Imgproc.boundingRect(boxPoints);
+        Mat coloredBlurred = new Mat();
+        Imgproc.cvtColor(ranged, coloredBlurred, Imgproc.COLOR_GRAY2BGR);
+        Imgproc.rectangle(coloredBlurred, new Point(rect.x, rect.y),
+                new Point(rect.x + rect.width, rect.y + rect.height), color, 10);
+        /*
+        // Find the top and bottom line
 		ArrayList<MatOfPoint> test = new ArrayList<MatOfPoint>();
 		test.add(goal);
 		Imgproc.drawContours(coloredBlurred, test, 0, color, 10);
@@ -109,14 +94,14 @@ public class Test1 {
 		Imgproc.line(coloredBlurred, new Point(x1, y1), new Point(x1, rect.y + rect.height), color, 10);
 		Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y + rect.height), color, 10);
 		*/
-		Utils.show(coloredBlurred, 0);
-		coloredBlurred.release();
-		boxPoints.release();
-		goal2f.release();
-		approxCurve.release();
-		contoured.release();
-		ranged.release();
-		src.release();
-	}
+        Utils.show(coloredBlurred, 0);
+        coloredBlurred.release();
+        boxPoints.release();
+        goal2f.release();
+        approxCurve.release();
+        contoured.release();
+        ranged.release();
+        src.release();
+    }
 
 }
