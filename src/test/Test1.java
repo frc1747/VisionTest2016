@@ -1,23 +1,13 @@
 package test;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
 
-import javax.swing.JFrame;
-
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
+
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Test1 {
 
@@ -125,14 +115,14 @@ public class Test1 {
 		Imgproc.line(coloredBlurred, new Point(x1, y1), new Point(x1, rect.y + rect.height), color, 10);
 		Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y + rect.height), color, 10);
 		*/
-		Utils.show(coloredBlurred, 0);
-		coloredBlurred.release();
-		boxPoints.release();
-		goal2f.release();
-		approxCurve.release();
-		contoured.release();
-		ranged.release();
-		src.release();
-	}
+        Utils.show(coloredBlurred, 0);
+        coloredBlurred.release();
+        boxPoints.release();
+        goal2f.release();
+        approxCurve.release();
+        contoured.release();
+        ranged.release();
+        src.release();
+    }
 
 }
