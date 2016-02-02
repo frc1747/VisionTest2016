@@ -28,11 +28,12 @@ public class Test4 {
 	public void test() {
 		VideoCapture vcap = new VideoCapture();
 		// TODO: Fix ip
-		//vcap.open("10.17.47.11");
-		vcap.open(0);
-		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
+		vcap.open("10.17.47.11");
 		while (!vcap.isOpened())
 			;
+		NetworkTable.setClientMode();
+		NetworkTable.setIPAddress("10.17.47.2");
+		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		while (vcap.isOpened()) {
 			Mat result = new Mat();
 			vcap.read(result);
@@ -86,14 +87,14 @@ public class Test4 {
 			goal.release();
 			return "unkown";
 		}
-//		System.out.println("AREA: " + maxArea);
+		// System.out.println("AREA: " + maxArea);
 
 		Rect rec = Imgproc.boundingRect(goal);
 		double y = rec.br().y + rec.height / 2.0;
 		y = -((2 * (y / src.height())) - 1);
 		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
 				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
-//		System.out.println("DISTANCE: " + distance);
+		// System.out.println("DISTANCE: " + distance);
 		double centerX = (rec.tl().x + rec.br().x) / 2.0;
 		double centerY = (rec.tl().y + rec.br().y) / 2.0;
 		String direction = "unknown";
