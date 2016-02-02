@@ -28,8 +28,8 @@ public class Test4 {
 	public void test() {
 		VideoCapture vcap = new VideoCapture();
 		// TODO: Fix ip
-		vcap.open("10.17.47.11");
-		while (!vcap.isOpened())
+		//vcap.open("10.17.47.11");
+		//while (!vcap.isOpened())
 			;
 		NetworkTable.setClientMode();
 		NetworkTable.setIPAddress("10.17.47.2");
