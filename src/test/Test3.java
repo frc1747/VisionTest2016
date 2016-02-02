@@ -6,7 +6,6 @@ import org.opencv.videoio.VideoCapture;
 
 public class Test3 {
     public void test() {
-        NetworkTable networkTable = NetworkTable.getTable("IMAGES");
         VideoCapture vcap = new VideoCapture();
         boolean opened = vcap.open("http://trackfield.webcam.oregonstate.edu/mjpg/video.mjpg");
         System.out.println(opened);
