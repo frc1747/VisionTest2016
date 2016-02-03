@@ -28,11 +28,13 @@ public class Test4 {
 	public void test() {
 		VideoCapture vcap = new VideoCapture();
 		// TODO: Fix ip
-		//vcap.open("10.17.47.11");
-		//while (!vcap.isOpened())
-			;
+		vcap.open("10.17.47.11/mjpg/video.mjpg");
+		while (!vcap.isOpened()) {
+			System.out.println("Waiting");
+		}
+		System.out.println("Done");
 		NetworkTable.setClientMode();
-		NetworkTable.setIPAddress("10.17.47.2");
+		NetworkTable.setIPAddress("roborio-1747-frc.local");
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		while (vcap.isOpened()) {
 			Mat result = new Mat();
