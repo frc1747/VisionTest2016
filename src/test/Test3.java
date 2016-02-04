@@ -1,6 +1,5 @@
 package test;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 

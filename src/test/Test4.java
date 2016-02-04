@@ -1,8 +1,17 @@
 package test;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
@@ -26,26 +35,30 @@ public class Test4 {
 	public static final double CAMERA_ANGLE = 10;
 
 	public void test() {
-		VideoCapture vcap = new VideoCapture();
-		// TODO: Fix ip
-		vcap.open("10.17.47.11/mjpg/video.mjpg");
-		while (!vcap.isOpened()) {
-			System.out.println("Waiting");
-		}
-		System.out.println("Done");
 		NetworkTable.setClientMode();
 		NetworkTable.setIPAddress("roborio-1747-frc.local");
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
-		while (vcap.isOpened()) {
-			Mat result = new Mat();
-			vcap.read(result);
-			String direction = processImage(result);
+		while (true) {
+			String direction = processImage();
 			System.out.println(direction);
 			networkTable.putString("ShootDirection", direction);
 		}
 	}
 
-	public String processImage(Mat src) {
+	public String processImage() {
+		Mat src=null;
+		try {
+			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
+			URLConnection uc = url.openConnection();
+			BufferedImage image = ImageIO.read(uc.getInputStream());
+			src=new Mat(image.getHeight(),image.getWidth(),CvType.CV_8UC3);
+			byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+			src.put(0, 0, pixels);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		// Look for red
 		Mat hsv = new Mat();
 		Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
