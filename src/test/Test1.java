@@ -1,6 +1,5 @@
 package test;
 
-
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Test1 {
-	
+
 	@SuppressWarnings("unused")
 	public void test(boolean video) {
 		Scanner scan = new Scanner(System.in);
@@ -34,18 +33,19 @@ public class Test1 {
 	}
 
 	public void processImage(Mat src) {
-		// Look for red
-		Mat hsv = new Mat();
-		Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
+		// Look for blue
+		// Mat hsv = new Mat();
+		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 125, 170); //40,40,170
-		Scalar upperBound = new Scalar(40, 255, 255); //120,120,255
-		Core.inRange(hsv, lowerBound, upperBound, ranged);
+		Scalar lowerBound = new Scalar(150, 180, 0);
+		Scalar upperBound = new Scalar(255, 255, 30);
+		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
-		Imgproc.medianBlur(ranged, ranged, 15);
-		Scalar upperThresh = new Scalar(255);
-		Scalar lowerThresh = new Scalar(200);
-		Core.inRange(ranged, lowerThresh, upperThresh, ranged);
+		// Imgproc.medianBlur(ranged, ranged, 15);
+		// Scalar upperThresh = new Scalar(255);
+		// Scalar lowerThresh = new Scalar(200);
+		// Core.inRange(ranged, lowerThresh, upperThresh, ranged);
+		Utils.show(ranged, 10);
 		// Look for rectangles
 		Mat contoured = ranged.clone();
 		ArrayList<MatOfPoint> pointList = new ArrayList<MatOfPoint>();
@@ -76,7 +76,7 @@ public class Test1 {
 			contourHierarchy.release();
 			return;
 		}
-	
+
 		// Color it
 		Scalar color = new Scalar(0, 255, 0);
 		MatOfPoint2f approxCurve = new MatOfPoint2f();
@@ -89,39 +89,29 @@ public class Test1 {
 		Imgproc.rectangle(coloredBlurred, new Point(rect.x, rect.y),
 				new Point(rect.x + rect.width, rect.y + rect.height), color, 10);
 		/*
-		// Find the top and bottom line
-		ArrayList<MatOfPoint> test = new ArrayList<MatOfPoint>();
-		test.add(goal);
-		Imgproc.drawContours(coloredBlurred, test, 0, color, 10);
-		int x1 = rect.x + rect.width / 3;
-		int y1 = rect.y + rect.height - 20;
-		double[] pixel;
-		do {
-			y1 -= 1;
-			pixel = coloredBlurred.get(y1, x1);
-		} while (pixel[0] + pixel[1] + pixel[2] < 75 && y1 > 0);
-		//Top of box
-		System.out.print((rect.y + rect.height) - y1 + "\t");
-		int x2 = rect.x + rect.width * 2 / 3;
-		int y2 = rect.y + rect.height - 20;
-		do {
-			y2 -= 1;
-			pixel = coloredBlurred.get(y2, x2);
-		} while (pixel[0] + pixel[1] + pixel[2] < 75 && y2 > 0);
-		//Bottom of box
-		System.out.println((rect.y + rect.height) - y2);
-		//Slope
-		System.out.println(((double) y2 - y1) / ((double) x2 - x1));
-		Imgproc.line(coloredBlurred, new Point(x1, y1), new Point(x1, rect.y + rect.height), color, 10);
-		Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y + rect.height), color, 10);
-		*/
-        Utils.show(coloredBlurred, 0);
-        coloredBlurred.release();
-        boxPoints.release();
-        goal2f.release();
-        approxCurve.release();
-        contoured.release();
-        ranged.release();
+		 * // Find the top and bottom line ArrayList<MatOfPoint> test = new
+		 * ArrayList<MatOfPoint>(); test.add(goal);
+		 * Imgproc.drawContours(coloredBlurred, test, 0, color, 10); int x1 =
+		 * rect.x + rect.width / 3; int y1 = rect.y + rect.height - 20; double[]
+		 * pixel; do { y1 -= 1; pixel = coloredBlurred.get(y1, x1); } while
+		 * (pixel[0] + pixel[1] + pixel[2] < 75 && y1 > 0); //Top of box
+		 * System.out.print((rect.y + rect.height) - y1 + "\t"); int x2 = rect.x
+		 * + rect.width * 2 / 3; int y2 = rect.y + rect.height - 20; do { y2 -=
+		 * 1; pixel = coloredBlurred.get(y2, x2); } while (pixel[0] + pixel[1] +
+		 * pixel[2] < 75 && y2 > 0); //Bottom of box System.out.println((rect.y
+		 * + rect.height) - y2); //Slope System.out.println(((double) y2 - y1) /
+		 * ((double) x2 - x1)); Imgproc.line(coloredBlurred, new Point(x1, y1),
+		 * new Point(x1, rect.y + rect.height), color, 10);
+		 * Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y
+		 * + rect.height), color, 10);
+		 */
+		Utils.show(coloredBlurred, 0);
+		coloredBlurred.release();
+		boxPoints.release();
+		goal2f.release();
+		approxCurve.release();
+		contoured.release();
+		ranged.release();
 		src.release();
 	}
 

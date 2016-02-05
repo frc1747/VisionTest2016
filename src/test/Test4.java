@@ -46,12 +46,12 @@ public class Test4 {
 	}
 
 	public String processImage() {
-		Mat src=null;
+		Mat src = null;
 		try {
 			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
 			URLConnection uc = url.openConnection();
 			BufferedImage image = ImageIO.read(uc.getInputStream());
-			src=new Mat(image.getHeight(),image.getWidth(),CvType.CV_8UC3);
+			src = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 			byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 			src.put(0, 0, pixels);
 		} catch (MalformedURLException e) {
@@ -59,18 +59,19 @@ public class Test4 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// Look for red
-		Mat hsv = new Mat();
-		Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
+		// Look for blue
+		// Mat hsv = new Mat();
+		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 125, 170); // 40,40,170
-		Scalar upperBound = new Scalar(40, 255, 255); // 120,120,255
-		Core.inRange(hsv, lowerBound, upperBound, ranged);
+		Scalar lowerBound = new Scalar(0, 235, 0);
+		Scalar upperBound = new Scalar(20, 255, 20);
+		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
-		Imgproc.medianBlur(ranged, ranged, 15);
-		Scalar upperThresh = new Scalar(255);
-		Scalar lowerThresh = new Scalar(200);
-		Core.inRange(ranged, lowerThresh, upperThresh, ranged);
+		// Imgproc.medianBlur(ranged, ranged, 15);
+		// Scalar upperThresh = new Scalar(255);
+		// Scalar lowerThresh = new Scalar(200);
+		// Core.inRange(ranged, lowerThresh, upperThresh, ranged);
+		Utils.show(ranged, 10);
 		// Look for rectangles
 		Mat contoured = ranged.clone();
 		ArrayList<MatOfPoint> pointList = new ArrayList<MatOfPoint>();
@@ -81,6 +82,7 @@ public class Test4 {
 		double maxArea = -1;
 		boolean foundGoal = false;
 		MatOfPoint goal = new MatOfPoint();
+
 		for (MatOfPoint testContour : pointList) {
 			double area = Imgproc.contourArea(testContour);
 			if (maxArea < area) {
@@ -109,7 +111,7 @@ public class Test4 {
 		y = -((2 * (y / src.height())) - 1);
 		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
 				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
-		// System.out.println("DISTANCE: " + distance);
+		System.out.println("DISTANCE: " + distance);
 		double centerX = (rec.tl().x + rec.br().x) / 2.0;
 		double centerY = (rec.tl().y + rec.br().y) / 2.0;
 		String direction = "unknown";
@@ -118,9 +120,9 @@ public class Test4 {
 		} else if (centerX > 2.0 * src.width() / 3.0) {
 			direction = "right";
 		} else if (centerY < src.height() / 3.0) {
-			direction = "forward";
-		} else if (centerY > 2.0 * src.height() / 3.0) {
 			direction = "backward";
+		} else if (centerY > 2.0 * src.height() / 3.0) {
+			direction = "forward";
 		} else {
 			direction = "shoot";
 		}
