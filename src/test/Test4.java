@@ -14,11 +14,12 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
-import edu.wpi.first.wpilibj.networktables.*;
+
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Test4 {
 
@@ -63,8 +64,8 @@ public class Test4 {
 		// Mat hsv = new Mat();
 		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 235, 0);
-		Scalar upperBound = new Scalar(20, 255, 20);
+		Scalar lowerBound = new Scalar(0, 220, 0);
+		Scalar upperBound = new Scalar(40, 255, 40);
 		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
 		// Imgproc.medianBlur(ranged, ranged, 15);
@@ -112,17 +113,21 @@ public class Test4 {
 		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
 				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
 		System.out.println("DISTANCE: " + distance);
-		double centerX = (rec.tl().x + rec.br().x) / 2.0;
-		double centerY = (rec.tl().y + rec.br().y) / 2.0;
+		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
+				topLeft = new Point(100, 100), bottomRight = new Point(300, 200);
+
+		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
+		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
+
 		String direction = "unknown";
-		if (centerX < src.width() / 3.0) {
+		if (center.x < topLeft.x) {
 			direction = "left";
-		} else if (centerX > 2.0 * src.width() / 3.0) {
+		} else if (center.x > bottomRight.x) {
 			direction = "right";
-		} else if (centerY < src.height() / 3.0) {
-			direction = "backward";
-		} else if (centerY > 2.0 * src.height() / 3.0) {
+		} else if (center.y > bottomRight.y) {
 			direction = "forward";
+		} else if (center.y < topLeft.y) {
+			direction = "backward";
 		} else {
 			direction = "shoot";
 		}
