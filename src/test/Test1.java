@@ -88,23 +88,13 @@ public class Test1 {
 		Imgproc.cvtColor(ranged, coloredBlurred, Imgproc.COLOR_GRAY2BGR);
 		Imgproc.rectangle(coloredBlurred, new Point(rect.x, rect.y),
 				new Point(rect.x + rect.width, rect.y + rect.height), color, 10);
-		/*
-		 * // Find the top and bottom line ArrayList<MatOfPoint> test = new
-		 * ArrayList<MatOfPoint>(); test.add(goal);
-		 * Imgproc.drawContours(coloredBlurred, test, 0, color, 10); int x1 =
-		 * rect.x + rect.width / 3; int y1 = rect.y + rect.height - 20; double[]
-		 * pixel; do { y1 -= 1; pixel = coloredBlurred.get(y1, x1); } while
-		 * (pixel[0] + pixel[1] + pixel[2] < 75 && y1 > 0); //Top of box
-		 * System.out.print((rect.y + rect.height) - y1 + "\t"); int x2 = rect.x
-		 * + rect.width * 2 / 3; int y2 = rect.y + rect.height - 20; do { y2 -=
-		 * 1; pixel = coloredBlurred.get(y2, x2); } while (pixel[0] + pixel[1] +
-		 * pixel[2] < 75 && y2 > 0); //Bottom of box System.out.println((rect.y
-		 * + rect.height) - y2); //Slope System.out.println(((double) y2 - y1) /
-		 * ((double) x2 - x1)); Imgproc.line(coloredBlurred, new Point(x1, y1),
-		 * new Point(x1, rect.y + rect.height), color, 10);
-		 * Imgproc.line(coloredBlurred, new Point(x2, y2), new Point(x2, rect.y
-		 * + rect.height), color, 10);
-		 */
+		Rect rec = Imgproc.boundingRect(goal);
+		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
+				topLeft = new Point(100, 100), bottomRight = new Point(300, 200);
+		
+		Imgproc.circle(coloredBlurred, center, 5, new Scalar(255, 0, 0));
+		Imgproc.rectangle(coloredBlurred, topLeft, bottomRight, new Scalar(0, 0, 255));
+		
 		Utils.show(coloredBlurred, 0);
 		coloredBlurred.release();
 		boxPoints.release();

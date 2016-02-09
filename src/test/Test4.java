@@ -113,6 +113,7 @@ public class Test4 {
 		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
 				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
 		System.out.println("DISTANCE: " + distance);
+		
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
 				topLeft = new Point(100, 100), bottomRight = new Point(300, 200);
 
