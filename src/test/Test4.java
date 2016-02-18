@@ -41,7 +41,7 @@ public class Test4 {
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		while (true) {
 			String direction = processImage();
-			System.out.println(direction);
+			// System.out.println(direction);
 			networkTable.putString("ShootDirection", direction);
 		}
 	}
@@ -55,6 +55,7 @@ public class Test4 {
 			src = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 			byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 			src.put(0, 0, pixels);
+			image = null;
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -72,7 +73,6 @@ public class Test4 {
 		// Scalar upperThresh = new Scalar(255);
 		// Scalar lowerThresh = new Scalar(200);
 		// Core.inRange(ranged, lowerThresh, upperThresh, ranged);
-		Utils.show(ranged, 10);
 		// Look for rectangles
 		Mat contoured = ranged.clone();
 		ArrayList<MatOfPoint> pointList = new ArrayList<MatOfPoint>();
@@ -97,13 +97,14 @@ public class Test4 {
 		}
 		if (!foundGoal) {
 			System.out.println("Goal not found");
+			Utils.show(src, 10);
 			contoured.release();
 			ranged.release();
 			src.release();
 			pointList.clear();
 			contourHierarchy.release();
 			goal.release();
-			return "unkown";
+			return "unknown";
 		}
 		// System.out.println("AREA: " + maxArea);
 
@@ -112,14 +113,14 @@ public class Test4 {
 		y = -((2 * (y / src.height())) - 1);
 		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
 				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
-		System.out.println("DISTANCE: " + distance);
-		
+		// System.out.println("DISTANCE: " + distance);
+
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(100, 100), bottomRight = new Point(300, 200);
+				topLeft = new Point(150, 125), bottomRight = new Point(175, 150);
 
 		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
 		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
-
+		Utils.show(src, 10);
 		String direction = "unknown";
 		if (center.x < topLeft.x) {
 			direction = "left";
