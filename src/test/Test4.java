@@ -40,13 +40,14 @@ public class Test4 {
 		NetworkTable.setIPAddress("roborio-1747-frc.local");
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		while (true) {
-			String direction = processImage();
+			Object[] direction = processImage();
 			// System.out.println(direction);
-			networkTable.putString("ShootDirection", direction);
+			networkTable.putString("ShootDirection", (String) direction[0]);
+			networkTable.putNumber("ShootAngle", (double) direction[1]);
 		}
 	}
 
-	public String processImage() {
+	public Object[] processImage() {
 		Mat src = null;
 		try {
 			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
@@ -104,7 +105,7 @@ public class Test4 {
 			pointList.clear();
 			contourHierarchy.release();
 			goal.release();
-			return "unknown";
+			return new Object[] { "unknown", 0.0};
 		}
 		// System.out.println("AREA: " + maxArea);
 
@@ -116,7 +117,11 @@ public class Test4 {
 		// System.out.println("DISTANCE: " + distance);
 
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(150, 125), bottomRight = new Point(175, 150);
+				topLeft = new Point(150, 125), bottomRight = new Point(175, 150),
+				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
+		double angle = Math.acos(Math.sqrt(Math.pow(center.x, 2) + Math.pow(center.y, 2)) / Math.pow(hitboxCenter.x, 2)
+				+ Math.pow(hitboxCenter.y, 2));
+		System.out.println();
 
 		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
 		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
@@ -136,6 +141,6 @@ public class Test4 {
 		contoured.release();
 		ranged.release();
 		src.release();
-		return direction;
+		return new Object[] { direction, angle };
 	}
 }
