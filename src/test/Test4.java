@@ -3,6 +3,7 @@ package test;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,7 +44,8 @@ public class Test4 {
 			Object[] direction = processImage();
 			// System.out.println(direction);
 			networkTable.putString("ShootDirection", (String) direction[0]);
-			networkTable.putNumber("ShootAngle", (double) direction[1]);
+			networkTable.putNumber("ShootRads", (double) direction[1]);
+			// networkTable.putNumber("ShootDistance", (double) direction[2]);
 		}
 	}
 
@@ -52,7 +54,9 @@ public class Test4 {
 		try {
 			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
 			URLConnection uc = url.openConnection();
-			BufferedImage image = ImageIO.read(uc.getInputStream());
+			InputStream imageStream = uc.getInputStream();
+			BufferedImage image = ImageIO.read(imageStream);
+			imageStream.close();
 			src = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 			byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 			src.put(0, 0, pixels);
@@ -105,7 +109,7 @@ public class Test4 {
 			pointList.clear();
 			contourHierarchy.release();
 			goal.release();
-			return new Object[] { "unknown", 0.0};
+			return new Object[] { "unknown", 0.0 };
 		}
 		// System.out.println("AREA: " + maxArea);
 
@@ -117,11 +121,12 @@ public class Test4 {
 		// System.out.println("DISTANCE: " + distance);
 
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(150, 125), bottomRight = new Point(175, 150),
+				topLeft = new Point(153.5, 115), bottomRight = new Point(177.5, 140),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.sqrt(Math.pow(center.x, 2) + Math.pow(center.y, 2)) / Math.pow(hitboxCenter.x, 2)
 				+ Math.pow(hitboxCenter.y, 2));
-		System.out.println();
+		// double boxDistance = (hitboxCenter.x - center.x);
+		// System.out.println(boxDistance);
 
 		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
 		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
@@ -141,6 +146,7 @@ public class Test4 {
 		contoured.release();
 		ranged.release();
 		src.release();
+		System.out.println(direction);
 		return new Object[] { direction, angle };
 	}
 }
