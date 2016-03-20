@@ -18,6 +18,7 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -133,6 +134,7 @@ public class Test4 {
 		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
 		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
 		Utils.show(src, 10);
+		Imgproc.rectangle(src, rec.tl(), rec.br(), new Scalar(0, 255, 255));
 		String direction = "unknown";
 		if (center.x < topLeft.x) {
 			direction = "left";
@@ -144,6 +146,9 @@ public class Test4 {
 			direction = "backward";
 		} else {
 			direction = "shoot";
+			if (System.currentTimeMillis() % 2 == 0) {
+				Imgcodecs.imwrite(("/Vision Logs/" + System.currentTimeMillis() + ".jpg"), src);
+			}
 		}
 		contoured.release();
 		ranged.release();
