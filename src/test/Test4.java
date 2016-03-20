@@ -63,14 +63,16 @@ public class Test4 {
 			image = null;
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+			return new Object[] { "unknown", 0.0 };
 		} catch (IOException e) {
 			e.printStackTrace();
+			return new Object[] { "unknown", 0.0 };
 		}
 		// Look for blue
 		// Mat hsv = new Mat();
 		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 220, 0);
+		Scalar lowerBound = new Scalar(0, 210, 0);
 		Scalar upperBound = new Scalar(40, 255, 40);
 		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
@@ -121,7 +123,7 @@ public class Test4 {
 		// System.out.println("DISTANCE: " + distance);
 
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(153.5, 115), bottomRight = new Point(177.5, 140),
+				topLeft = new Point(156, 115), bottomRight = new Point(177, 137),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.sqrt(Math.pow(center.x, 2) + Math.pow(center.y, 2)) / Math.pow(hitboxCenter.x, 2)
 				+ Math.pow(hitboxCenter.y, 2));
