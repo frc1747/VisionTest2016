@@ -41,16 +41,18 @@ public class Test4 {
 		NetworkTable.setClientMode();
 		NetworkTable.setIPAddress("roborio-1747-frc.local");
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
+		double counter = 0;
 		while (true) {
-			Object[] direction = processImage();
+			Object[] direction = processImage(counter);
 			// System.out.println(direction);
 			networkTable.putString("ShootDirection", (String) direction[0]);
 			networkTable.putNumber("ShootRads", (double) direction[1]);
 			// networkTable.putNumber("ShootDistance", (double) direction[2]);
+			counter++;
 		}
 	}
 
-	public Object[] processImage() {
+	public Object[] processImage(double counter) {
 		Mat src = null;
 		try {
 			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
@@ -73,8 +75,8 @@ public class Test4 {
 		// Mat hsv = new Mat();
 		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 210, 0);
-		Scalar upperBound = new Scalar(40, 255, 40);
+		Scalar lowerBound = new Scalar(0, 200, 0);//was 0,210,0
+		Scalar upperBound = new Scalar(50, 255, 50);//was 40,255,40
 		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
 		// Imgproc.medianBlur(ranged, ranged, 15);
@@ -124,30 +126,31 @@ public class Test4 {
 		// System.out.println("DISTANCE: " + distance);
 
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(156, 115), bottomRight = new Point(177, 137),
+				topLeft = new Point(158.5, 114), bottomRight = new Point(173.5, 136),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
-		double angle = Math.acos(Math.sqrt(Math.pow(center.x, 2) + Math.pow(center.y, 2)) / Math.pow(hitboxCenter.x, 2)
-				+ Math.pow(hitboxCenter.y, 2));
+		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x-hitboxCenter.x, 2) + Math.pow(center.y, 2))
+				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
+		System.out.println(angle);
 		// double boxDistance = (hitboxCenter.x - center.x);
 		// System.out.println(boxDistance);
 
 		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
 		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
-		Utils.show(src, 10);
 		Imgproc.rectangle(src, rec.tl(), rec.br(), new Scalar(0, 255, 255));
+		Utils.show(src, 10);
 		String direction = "unknown";
-		if (center.x < topLeft.x) {
-			direction = "left";
-		} else if (center.x > bottomRight.x) {
-			direction = "right";
-		} else if (center.y > bottomRight.y) {
+		if (center.y > bottomRight.y) {
 			direction = "forward";
 		} else if (center.y < topLeft.y) {
 			direction = "backward";
+		} else if (center.x < topLeft.x) {
+			direction = "left";
+		} else if (center.x > bottomRight.x) {
+			direction = "right";
 		} else {
 			direction = "shoot";
-			if (System.currentTimeMillis() % 2 == 0) {
-				Imgcodecs.imwrite(("/Vision Logs/" + System.currentTimeMillis() + ".jpg"), src);
+			if (counter % 20 == 0) {
+				Imgcodecs.imwrite((".\\VisionLogs\\" + System.currentTimeMillis() + ".jpg"), src);
 			}
 		}
 		contoured.release();
