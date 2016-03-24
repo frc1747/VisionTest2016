@@ -126,7 +126,7 @@ public class Test4 {
 		// System.out.println("DISTANCE: " + distance);
 
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(158.5, 114), bottomRight = new Point(173.5, 136),
+				topLeft = new Point(148.5, 119), bottomRight = new Point(163.5, 141),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x-hitboxCenter.x, 2) + Math.pow(center.y, 2))
 				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
