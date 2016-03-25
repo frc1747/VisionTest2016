@@ -43,19 +43,22 @@ public class Test4 {
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		double counter = 0;
 		while (true) {
-			Object[] direction = processImage(counter);
-			// System.out.println(direction);
-			networkTable.putString("ShootDirection", (String) direction[0]);
-			networkTable.putNumber("ShootRads", (double) direction[1]);
-			// networkTable.putNumber("ShootDistance", (double) direction[2]);
-			counter++;
+			if (networkTable.isConnected()) {
+				Object[] direction = processImage(counter);
+				// System.out.println(direction);
+				networkTable.putString("ShootDirection", (String) direction[0]);
+				networkTable.putNumber("ShootRads", (double) direction[1]);
+				// networkTable.putNumber("ShootDistance", (double)
+				// direction[2]);
+				counter++;
+			}
 		}
 	}
 
 	public Object[] processImage(double counter) {
 		Mat src = null;
 		try {
-			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
+			URL url = new URL("http://axis-camera.local/axis-cgi/jpg/image.cgi");
 			URLConnection uc = url.openConnection();
 			InputStream imageStream = uc.getInputStream();
 			BufferedImage image = ImageIO.read(imageStream);
@@ -65,18 +68,18 @@ public class Test4 {
 			src.put(0, 0, pixels);
 			image = null;
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			System.err.println("Bad URL");
 			return new Object[] { "unknown", 0.0 };
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("No Camera");
 			return new Object[] { "unknown", 0.0 };
 		}
 		// Look for blue
 		// Mat hsv = new Mat();
 		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 200, 0);//was 0,210,0
-		Scalar upperBound = new Scalar(50, 255, 50);//was 40,255,40
+		Scalar lowerBound = new Scalar(0, 200, 0);// was 0,210,0
+		Scalar upperBound = new Scalar(50, 255, 50);// was 40,255,40
 		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
 		// Imgproc.medianBlur(ranged, ranged, 15);
@@ -106,7 +109,7 @@ public class Test4 {
 			}
 		}
 		if (!foundGoal) {
-			System.out.println("Goal not found");
+			System.err.println("Goal not found");
 			Utils.show(src, 10);
 			contoured.release();
 			ranged.release();
@@ -123,12 +126,13 @@ public class Test4 {
 		y = -((2 * (y / src.height())) - 1);
 		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
 				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
-		// System.out.println("DISTANCE: " + distance);
+				// System.out.println("DISTANCE: " + distance);
 
+		// Logic is inverted for how you move it
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(148.5, 119), bottomRight = new Point(163.5, 141),
+				topLeft = new Point(148.5, 117), bottomRight = new Point(163.5, 139),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
-		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x-hitboxCenter.x, 2) + Math.pow(center.y, 2))
+		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x - hitboxCenter.x, 2) + Math.pow(center.y, 2))
 				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
 		System.out.println(angle);
 		// double boxDistance = (hitboxCenter.x - center.x);
@@ -150,7 +154,7 @@ public class Test4 {
 		} else {
 			direction = "shoot";
 			if (counter % 20 == 0) {
-				Imgcodecs.imwrite((".\\VisionLogs\\" + System.currentTimeMillis() + ".jpg"), src);
+				Imgcodecs.imwrite((".\\VisionLogs\\" + +System.currentTimeMillis() + ".jpg"), src);
 			}
 		}
 		contoured.release();
