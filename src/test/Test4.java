@@ -35,7 +35,9 @@ public class Test4 {
 	public static final double VERTICAL_FOV = 35.25;
 	public static final double HORIZONTAL_FOV = 47;
 	// TODO: Verify this
-	public static final double CAMERA_ANGLE = 10;
+	public static final double CAMERA_ANGLE = 42.0;
+	public static final double PIXEL_ANGLE = CAMERA_ANGLE/320.0;
+	//public static final double ROBOT_CENTER_ANGLE = Math.atan(12/13*Math.tan())fix if needed - Carl
 
 	public void test() {
 		NetworkTable.setClientMode();
@@ -48,6 +50,7 @@ public class Test4 {
 				// System.out.println(direction);
 				networkTable.putString("ShootDirection", (String) direction[0]);
 				networkTable.putNumber("ShootRads", (double) direction[1]);
+				networkTable.putNumber("GyroAngle", (double) direction[2]);
 				// networkTable.putNumber("ShootDistance", (double)
 				// direction[2]);
 				counter++;
@@ -72,7 +75,7 @@ public class Test4 {
 			return new Object[] { "unknown", 0.0 };
 		} catch (IOException e) {
 			System.err.println("No Camera");
-			return new Object[] { "unknown", 0.0 };
+			return new Object[] { "unknown", 0.0, 0.0 };
 		}
 		// Look for blue
 		// Mat hsv = new Mat();
@@ -117,7 +120,7 @@ public class Test4 {
 			pointList.clear();
 			contourHierarchy.release();
 			goal.release();
-			return new Object[] { "unknown", 0.0 };
+			return new Object[] { "unknown", 0.0,0.0 };
 		}
 		// System.out.println("AREA: " + maxArea);
 
@@ -130,10 +133,11 @@ public class Test4 {
 
 		// Logic is inverted for how you move it
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(149.5, 117), bottomRight = new Point(164.5, 139),
+				topLeft = new Point(154.5, 117.5), bottomRight = new Point(162.5, 137), // Old Values topLeft = new Point(151.5, 117), bottomRight = new Point(165.5, 139),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x - hitboxCenter.x, 2) + Math.pow(center.y, 2))
 				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
+		double gyroAngle = (CAMERA_ANGLE/320)*Math.abs(hitboxCenter.x - center.x);
 		System.out.println(angle);
 		// double boxDistance = (hitboxCenter.x - center.x);
 		// System.out.println(boxDistance);
@@ -161,6 +165,8 @@ public class Test4 {
 		ranged.release();
 		src.release();
 		System.out.println(direction);
-		return new Object[] { direction, angle };
+		System.out.println(gyroAngle);
+		return new Object[] { direction, angle, gyroAngle };
+		
 	}
 }
