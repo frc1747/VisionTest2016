@@ -35,7 +35,7 @@ public class Test4 {
 	public static final double VERTICAL_FOV = 35.25;
 	public static final double HORIZONTAL_FOV = 47;
 	// TODO: Verify this
-	public static final double CAMERA_ANGLE = 42.0;
+	public static final double CAMERA_ANGLE = 50.0; //calculated 4/13/16 -JH
 	public static final double PIXEL_ANGLE = CAMERA_ANGLE/320.0;
 	//public static final double ROBOT_CENTER_ANGLE = Math.atan(12/13*Math.tan())fix if needed - Carl
 
@@ -61,7 +61,8 @@ public class Test4 {
 	public Object[] processImage(double counter) {
 		Mat src = null;
 		try {
-			URL url = new URL("http://axis-camera.local/axis-cgi/jpg/image.cgi");
+//			URL url = new URL("http://axis-camera.local/axis-cgi/jpg/image.cgi");
+			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
 			URLConnection uc = url.openConnection();
 			InputStream imageStream = uc.getInputStream();
 			BufferedImage image = ImageIO.read(imageStream);
