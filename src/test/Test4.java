@@ -25,23 +25,22 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Test4 {
 
-	// Constants for known variables
-	// the height to the top of the target in first stronghold is 97 inches
-	public static final int TOP_TARGET_HEIGHT = 97;
-	// the physical height of the camera lens
-	// TODO: Verify this
-	public static final int TOP_CAMERA_HEIGHT = 32;
+	
+	public static final int IMAGE_WIDTH = 320;
+	public static final int IMAGE_HEIGHT = 240;
 
 	public static final double VERTICAL_FOV = 35.25;
 	public static final double HORIZONTAL_FOV = 47;
 	// TODO: Verify this
-	public static final double CAMERA_ANGLE = 50.0; //calculated 4/13/16 -JH
+	public static final double CAMERA_ANGLE = 60.0; //calculated 4/13/16 -JH
 	public static final double PIXEL_ANGLE = CAMERA_ANGLE/320.0;
+	
+	public static final double FOCAL_LENGTH_PIXELS = (0.5 * IMAGE_WIDTH / Math.tan(HORIZONTAL_FOV)/2);
 	//public static final double ROBOT_CENTER_ANGLE = Math.atan(12/13*Math.tan())fix if needed - Carl
 
 	public void test() {
 		NetworkTable.setClientMode();
-		NetworkTable.setIPAddress("roborio-1747-frc.local");
+		NetworkTable.setIPAddress("10.17.47.2");
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		double counter = 0;
 		while (true) {
@@ -61,8 +60,8 @@ public class Test4 {
 	public Object[] processImage(double counter) {
 		Mat src = null;
 		try {
-//			URL url = new URL("http://axis-camera.local/axis-cgi/jpg/image.cgi");
-			URL url = new URL("http://10.17.47.11/axis-cgi/jpg/image.cgi");
+			//URL url = new URL("http://axis-camera.local/axis-cgi/jpg/image.cgi");
+			URL url = new URL("http://10.17.47.16/axis-cgi/jpg/image.cgi");
 			URLConnection uc = url.openConnection();
 			InputStream imageStream = uc.getInputStream();
 			BufferedImage image = ImageIO.read(imageStream);
@@ -82,7 +81,7 @@ public class Test4 {
 		// Mat hsv = new Mat();
 		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
-		Scalar lowerBound = new Scalar(0, 200, 0);// was 0,210,0
+		Scalar lowerBound = new Scalar(0, 140, 0);// was 0,210,0
 		Scalar upperBound = new Scalar(50, 255, 50);// was 40,255,40
 		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
@@ -128,17 +127,17 @@ public class Test4 {
 		Rect rec = Imgproc.boundingRect(goal);
 		double y = rec.br().y + rec.height / 2.0;
 		y = -((2 * (y / src.height())) - 1);
-		double distance = (TOP_TARGET_HEIGHT - TOP_CAMERA_HEIGHT)
-				/ Math.tan((y * VERTICAL_FOV / 2.0 + CAMERA_ANGLE) * Math.PI / 180.0);
 				// System.out.println("DISTANCE: " + distance);
 
-		// Logic is inverted for how you move it
+		// Moving hitbox to right moves shot to left (Increasing x)
+		// Moving hitbox down moves shot up (Increasing y)
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(154.5, 117.5), bottomRight = new Point(162.5, 137), // Old Values topLeft = new Point(151.5, 117), bottomRight = new Point(165.5, 139),
+				topLeft = new Point(158, 106.5), bottomRight = new Point(166, 123), // Old Values topLeft = new Point(151.5, 117), bottomRight = new Point(165.5, 139),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x - hitboxCenter.x, 2) + Math.pow(center.y, 2))
 				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
-		double gyroAngle = (CAMERA_ANGLE/320)*Math.abs(hitboxCenter.x - center.x);
+		//double gyroAngle = (CAMERA_ANGLE/320)*Math.abs(hitboxCenter.x - center.x);
+		double gyroAngle = Math.toDegrees(Math.atan((hitboxCenter.x - center.x)/FOCAL_LENGTH_PIXELS));
 		System.out.println(angle);
 		// double boxDistance = (hitboxCenter.x - center.x);
 		// System.out.println(boxDistance);
@@ -148,14 +147,15 @@ public class Test4 {
 		Imgproc.rectangle(src, rec.tl(), rec.br(), new Scalar(0, 255, 255));
 		Utils.show(src, 10);
 		String direction = "unknown";
+		
 		if (center.y > bottomRight.y) {
-			direction = "forward";
+				direction = "forward";
 		} else if (center.y < topLeft.y) {
-			direction = "backward";
-		} else if (center.x < topLeft.x) {
-			direction = "left";
-		} else if (center.x > bottomRight.x) {
-			direction = "right";
+				direction = "backward";
+		}else if (center.x < topLeft.x) {
+					direction = "left";
+				} else if (center.x > bottomRight.x) {
+					direction = "right";
 		} else {
 			direction = "shoot";
 			if (counter % 20 == 0) {
