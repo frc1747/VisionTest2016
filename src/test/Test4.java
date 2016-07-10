@@ -113,7 +113,7 @@ public class Test4 {
 		}
 		if (!foundGoal) {
 			System.err.println("Goal not found");
-			Utils.show(src, 10);
+			//Utils.show(src, 10);
 			contoured.release();
 			ranged.release();
 			src.release();
@@ -132,7 +132,7 @@ public class Test4 {
 		// Moving hitbox to right moves shot to left (Increasing x)
 		// Moving hitbox down moves shot up (Increasing y)
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(158, 106.5), bottomRight = new Point(166, 123), // Old Values topLeft = new Point(151.5, 117), bottomRight = new Point(165.5, 139),
+				topLeft = new Point(160, 106.5), bottomRight = new Point(168, 122), // Old Values topLeft = new Point(151.5, 117), bottomRight = new Point(165.5, 139),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x - hitboxCenter.x, 2) + Math.pow(center.y, 2))
 				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
@@ -152,9 +152,9 @@ public class Test4 {
 				direction = "forward";
 		} else if (center.y < topLeft.y) {
 				direction = "backward";
-		}else if (center.x < topLeft.x) {
+		} else if (center.x < topLeft.x) {
 					direction = "left";
-				} else if (center.x > bottomRight.x) {
+		} else if (center.x > bottomRight.x) {
 					direction = "right";
 		} else {
 			direction = "shoot";
