@@ -1,24 +1,14 @@
 package test;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -38,12 +28,19 @@ public class Test4 {
 	public static final double FOCAL_LENGTH_PIXELS = (0.5 * IMAGE_WIDTH / Math.tan(HORIZONTAL_FOV)/2);
 	//public static final double ROBOT_CENTER_ANGLE = Math.atan(12/13*Math.tan())fix if needed - Carl
 
+	public VideoCapture vcap = new VideoCapture();
+    
 	public void test() {
 		NetworkTable.setClientMode();
 		NetworkTable.setIPAddress("10.17.47.2");
 		NetworkTable networkTable = NetworkTable.getTable("imageProcessing");
 		double counter = 0;
-		while (true) {
+		String url = "http://10.17.47.16/mjpg/video.mjpg";
+
+	    vcap.open(url);
+	    System.out.println(vcap.isOpened());
+	    
+		while (vcap.isOpened()) {
 			if (networkTable.isConnected()) {
 				Object[] direction = processImage(counter);
 				// System.out.println(direction);
@@ -53,13 +50,20 @@ public class Test4 {
 				// networkTable.putNumber("ShootDistance", (double)
 				// direction[2]);
 				counter++;
+				try {
+					//Thread.sleep((long) (1 / 25.0 * 1000));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
 			}
 		}
 	}
 
 	public Object[] processImage(double counter) {
-		Mat src = null;
+		Mat src = new Mat();
 		try {
+			/*
 			//URL url = new URL("http://axis-camera.local/axis-cgi/jpg/image.cgi");
 			URL url = new URL("http://10.17.47.16/axis-cgi/jpg/image.cgi");
 			URLConnection uc = url.openConnection();
@@ -69,21 +73,34 @@ public class Test4 {
 			src = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 			byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 			src.put(0, 0, pixels);
-			image = null;
-		} catch (MalformedURLException e) {
-			System.err.println("Bad URL");
+			image = null;*/
+			//System.out.println(vcap.grab());
+			//System.out.println(vcap.retrieve(src));
+			vcap.read(src);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		//System.out.println(src.channels());
+		if(src.empty()) {
+			//System.out.println();
+			return new Object[] { "unknown", 0.0,0.0 };
+		}
+		/*catch (MalformedURLException e) {
+			System.err.println("Bad URL"); 
 			return new Object[] { "unknown", 0.0 };
 		} catch (IOException e) {
 			System.err.println("No Camera");
 			return new Object[] { "unknown", 0.0, 0.0 };
-		}
+		}*/
 		// Look for blue
 		// Mat hsv = new Mat();
 		// Imgproc.cvtColor(src, hsv, Imgproc.COLOR_BGR2HSV);
 		Mat ranged = new Mat();
 		Scalar lowerBound = new Scalar(0, 140, 0);// was 0,210,0
 		Scalar upperBound = new Scalar(50, 255, 50);// was 40,255,40
-		Core.inRange(src, lowerBound, upperBound, ranged);
+		//if(src.channels() > 1) {
+			Core.inRange(src, lowerBound, upperBound, ranged);
+		//}
 		// blur image
 		// Imgproc.medianBlur(ranged, ranged, 15);
 		// Scalar upperThresh = new Scalar(255);
@@ -142,9 +159,9 @@ public class Test4 {
 		// double boxDistance = (hitboxCenter.x - center.x);
 		// System.out.println(boxDistance);
 
-		Imgproc.circle(src, center, 5, new Scalar(255, 0, 0));
-		Imgproc.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
-		Imgproc.rectangle(src, rec.tl(), rec.br(), new Scalar(0, 255, 255));
+		Core.circle(src, center, 5, new Scalar(255, 0, 0));
+		Core.rectangle(src, topLeft, bottomRight, new Scalar(0, 0, 255));
+		Core.rectangle(src, rec.tl(), rec.br(), new Scalar(0, 255, 255));
 		Utils.show(src, 10);
 		String direction = "unknown";
 		
@@ -159,7 +176,7 @@ public class Test4 {
 		} else {
 			direction = "shoot";
 			if (counter % 20 == 0) {
-				Imgcodecs.imwrite((".\\VisionLogs\\" + +System.currentTimeMillis() + ".jpg"), src);
+				//Imgcodecs.imwrite((".\\VisionLogs\\" + +System.currentTimeMillis() + ".jpg"), src);
 			}
 		}
 		contoured.release();
