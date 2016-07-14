@@ -8,6 +8,7 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
@@ -16,14 +17,14 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 public class Test4 {
 
 	
-	public static final int IMAGE_WIDTH = 320;
-	public static final int IMAGE_HEIGHT = 240;
+	public static final int IMAGE_WIDTH = 640;
+	public static final int IMAGE_HEIGHT = 8;
 
 	public static final double VERTICAL_FOV = 35.25;
 	public static final double HORIZONTAL_FOV = 47;
 	// TODO: Verify this
 	public static final double CAMERA_ANGLE = 60.0; //calculated 4/13/16 -JH
-	public static final double PIXEL_ANGLE = CAMERA_ANGLE/320.0;
+	public static final double PIXEL_ANGLE = CAMERA_ANGLE/640.0;
 	
 	public static final double FOCAL_LENGTH_PIXELS = (0.5 * IMAGE_WIDTH / Math.tan(HORIZONTAL_FOV)/2);
 	//public static final double ROBOT_CENTER_ANGLE = Math.atan(12/13*Math.tan())fix if needed - Carl
@@ -50,12 +51,6 @@ public class Test4 {
 				// networkTable.putNumber("ShootDistance", (double)
 				// direction[2]);
 				counter++;
-				try {
-					//Thread.sleep((long) (1 / 25.0 * 1000));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
 			}
 		}
 	}
@@ -82,7 +77,6 @@ public class Test4 {
 		}
 		//System.out.println(src.channels());
 		if(src.empty()) {
-			//System.out.println();
 			return new Object[] { "unknown", 0.0,0.0 };
 		}
 		/*catch (MalformedURLException e) {
@@ -98,9 +92,7 @@ public class Test4 {
 		Mat ranged = new Mat();
 		Scalar lowerBound = new Scalar(0, 140, 0);// was 0,210,0
 		Scalar upperBound = new Scalar(50, 255, 50);// was 40,255,40
-		//if(src.channels() > 1) {
-			Core.inRange(src, lowerBound, upperBound, ranged);
-		//}
+		Core.inRange(src, lowerBound, upperBound, ranged);
 		// blur image
 		// Imgproc.medianBlur(ranged, ranged, 15);
 		// Scalar upperThresh = new Scalar(255);
@@ -149,7 +141,7 @@ public class Test4 {
 		// Moving hitbox to right moves shot to left (Increasing x)
 		// Moving hitbox down moves shot up (Increasing y)
 		Point center = new Point((rec.tl().x + rec.br().x) / 2.0, (rec.tl().y + rec.br().y) / 2.0),
-				topLeft = new Point(160, 106.5), bottomRight = new Point(168, 122), // Old Values topLeft = new Point(151.5, 117), bottomRight = new Point(165.5, 139),
+				topLeft = new Point(321, 213), bottomRight = new Point(336, 244),
 				hitboxCenter = new Point((topLeft.x + bottomRight.x) / 2.0, (topLeft.y + bottomRight.y) / 2.0);
 		double angle = Math.acos(Math.abs(Math.sqrt(Math.pow(center.x - hitboxCenter.x, 2) + Math.pow(center.y, 2))
 				/ Math.sqrt(Math.pow(hitboxCenter.x, 2) + Math.pow(hitboxCenter.y, 2))));
@@ -176,7 +168,7 @@ public class Test4 {
 		} else {
 			direction = "shoot";
 			if (counter % 20 == 0) {
-				//Imgcodecs.imwrite((".\\VisionLogs\\" + +System.currentTimeMillis() + ".jpg"), src);
+				//Highgui.imwrite((".\\VisionLogs\\" + +System.currentTimeMillis() + ".jpg"), src);
 			}
 		}
 		contoured.release();
